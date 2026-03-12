@@ -27,6 +27,18 @@ namespace StarterAssets
 
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
+        
+        [Header("Crouch")]
+        public float CrouchSpeed = 1.0f;
+        public float CrouchHeight = 1.0f;
+        public float StandingHeight = 2.0f;
+        public Vector3 CrouchCenter = new Vector3(0f, 0.5f, 0f);
+        public Vector3 StandingCenter = new Vector3(0f, 1.0f, 0f);
+
+        private bool _isCrouching;
+        private int _animIDCrouch;
+
+        public bool IsCrouching => _isCrouching;
 
         public AudioClip LandingAudioClip;
         public AudioClip[] FootstepAudioClips;
@@ -156,9 +168,11 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
+            HandleCrouch();
             JumpAndGravity();
             GroundedCheck();
             Move();
+
         }
 
         private void LateUpdate()
@@ -173,6 +187,7 @@ namespace StarterAssets
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDCrouch = Animator.StringToHash("Crouch");
         }
 
         private void GroundedCheck()
@@ -214,7 +229,17 @@ namespace StarterAssets
         private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            float targetSpeed;
+            if(_isCrouching)
+            { 
+                targetSpeed = CrouchSpeed;
+            }
+            else
+            {
+                targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            }
+
+
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -276,6 +301,26 @@ namespace StarterAssets
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+            }
+        }
+        private void HandleCrouch()
+        {
+            _isCrouching = _input.crouch;
+
+            if (_isCrouching)
+            {
+                _controller.height = CrouchHeight;
+                _controller.center = CrouchCenter;
+            }
+            else
+            {
+                _controller.height = StandingHeight;
+                _controller.center = StandingCenter;
+            }
+
+            if (_hasAnimator)
+            {
+                _animator.SetBool(_animIDCrouch, _isCrouching);
             }
         }
 
