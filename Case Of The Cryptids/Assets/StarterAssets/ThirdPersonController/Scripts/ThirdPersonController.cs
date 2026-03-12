@@ -33,10 +33,13 @@ namespace StarterAssets
         public float CrouchHeight = 1.0f;
         public float StandingHeight = 2.0f;
         public Vector3 CrouchCenter = new Vector3(0f, 0.5f, 0f);
-        public Vector3 StandingCenter = new Vector3(0f, 1.0f, 0f);
+        public Vector3 StandingCenter = new Vector3(0f, 0.8f, 0f);
 
         private bool _isCrouching;
         private int _animIDCrouch;
+        private bool _isStandingUp;
+        private float _standUpTimer;
+        public float StandUpDelay = 0.75f;
 
         public bool IsCrouching => _isCrouching;
 
@@ -303,26 +306,23 @@ namespace StarterAssets
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
         }
-        private void HandleCrouch()
-        {
-            _isCrouching = _input.crouch;
+private bool _crouchPressedLastFrame;
 
-            if (_isCrouching)
-            {
-                _controller.height = CrouchHeight;
-                _controller.center = CrouchCenter;
-            }
-            else
-            {
-                _controller.height = StandingHeight;
-                _controller.center = StandingCenter;
-            }
+private void HandleCrouch()
+{
+    // Detect a fresh crouch press
+    if (_input.crouch && !_crouchPressedLastFrame)
+    {
+        _isCrouching = !_isCrouching;
+    }
 
-            if (_hasAnimator)
-            {
-                _animator.SetBool(_animIDCrouch, _isCrouching);
-            }
-        }
+    _crouchPressedLastFrame = _input.crouch;
+
+    if (_hasAnimator)
+    {
+        _animator.SetBool(_animIDCrouch, _isCrouching);
+    }
+}
 
         private void JumpAndGravity()
         {
@@ -398,6 +398,11 @@ namespace StarterAssets
             if (lfAngle < -360f) lfAngle += 360f;
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
+        }
+        public void RestoreStandingCollider()
+        {
+            _controller.height = StandingHeight;
+            _controller.center = StandingCenter;
         }
 
         private void OnDrawGizmosSelected()
