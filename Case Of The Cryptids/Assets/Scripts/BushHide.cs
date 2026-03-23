@@ -6,7 +6,12 @@ public class BushHide : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player entered bush - hidden");
+            PlayerStealth playerStealth = other.GetComponent<PlayerStealth>();
+
+            if (playerStealth != null)
+            {
+                playerStealth.SetHidden(true);
+            }
         }
     }
 
@@ -14,7 +19,12 @@ public class BushHide : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player left bush - visible");
+            PlayerStealth playerStealth = other.GetComponent<PlayerStealth>();
+
+            if (playerStealth != null)
+            {
+                playerStealth.SetHidden(false);
+            }
         }
     }
 }
