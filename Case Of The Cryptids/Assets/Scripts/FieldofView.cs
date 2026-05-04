@@ -6,6 +6,7 @@ using UnityEngine;
 public class FieldOfView : MonoBehaviour
 {
     public float radius;
+
     [Range(0, 360)]
     public float angle;
 
@@ -16,9 +17,18 @@ public class FieldOfView : MonoBehaviour
 
     public bool canSeePlayer;
 
+    [Header("Detection UI")]
+    public GameObject exclamationMark;
+
     private void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
+
+        if (exclamationMark != null)
+        {
+            exclamationMark.SetActive(false);
+        }
+
         StartCoroutine(FOVRoutine());
     }
 
@@ -30,6 +40,11 @@ public class FieldOfView : MonoBehaviour
         {
             yield return wait;
             FieldOfViewCheck();
+
+            if (exclamationMark != null)
+            {
+                exclamationMark.SetActive(canSeePlayer);
+            }
         }
     }
 
@@ -52,9 +67,13 @@ public class FieldOfView : MonoBehaviour
                     canSeePlayer = false;
             }
             else
+            {
                 canSeePlayer = false;
+            }
         }
         else if (canSeePlayer)
+        {
             canSeePlayer = false;
+        }
     }
 }
