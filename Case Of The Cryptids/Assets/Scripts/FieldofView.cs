@@ -20,6 +20,15 @@ public class FieldOfView : MonoBehaviour
     [Header("Detection UI")]
     public GameObject exclamationMark;
 
+    [Header("Detection Sound")]
+    public AudioSource audioSource;
+    public AudioClip detectedSound;
+
+    [Header("Rotation")]
+    public float rotationSpeed = 5f;
+
+    private bool wasSeeingPlayer;
+
     private void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
@@ -32,6 +41,14 @@ public class FieldOfView : MonoBehaviour
         StartCoroutine(FOVRoutine());
     }
 
+    private void Update()
+    {
+        if (canSeePlayer && playerRef != null)
+        {
+            RotateTowardPlayer();
+        }
+    }
+
     private IEnumerator FOVRoutine()
     {
         WaitForSeconds wait = new WaitForSeconds(0.2f);
@@ -39,11 +56,19 @@ public class FieldOfView : MonoBehaviour
         while (true)
         {
             yield return wait;
+
+            wasSeeingPlayer = canSeePlayer;
+
             FieldOfViewCheck();
 
             if (exclamationMark != null)
             {
                 exclamationMark.SetActive(canSeePlayer);
+            }
+
+            if (canSeePlayer && !wasSeeingPlayer)
+            {
+                PlayDetectionSound();
             }
         }
     }
@@ -62,18 +87,46 @@ public class FieldOfView : MonoBehaviour
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
+                {
                     canSeePlayer = true;
+                }
                 else
+                {
                     canSeePlayer = false;
+                }
             }
             else
             {
                 canSeePlayer = false;
             }
         }
-        else if (canSeePlayer)
+        else
         {
             canSeePlayer = false;
+        }
+    }
+
+    private void RotateTowardPlayer()
+    {
+        Vector3 direction = playerRef.transform.position - transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.01f)
+            return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
+        );
+    }
+
+    private void PlayDetectionSound()
+    {
+        if (audioSource != null && detectedSound != null)
+        {
+            audioSource.PlayOneShot(detectedSound);
         }
     }
 }
