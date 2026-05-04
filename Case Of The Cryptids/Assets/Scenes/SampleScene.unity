@@ -517,6 +517,7 @@ GameObject:
   - component: {fileID: 109970387}
   - component: {fileID: 109970386}
   - component: {fileID: 109970385}
+  - component: {fileID: 109970388}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -607,6 +608,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &109970388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 109970383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273ff3ee1908c8146ac8ce3145b6728a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Billboard
+  cam: {fileID: 405290922}
 --- !u!1 &133762639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1371,6 +1385,11 @@ PrefabInstance:
 --- !u!4 &405290921 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2119775930974504096, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
+  m_PrefabInstance: {fileID: 405290920}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &405290922 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5542111180780342647, guid: c708a3b79cd542b42bbfedb17e213bc1, type: 3}
   m_PrefabInstance: {fileID: 405290920}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &410087039
