@@ -11,73 +11,84 @@ public class GuardDetection : MonoBehaviour
     private NavMeshAgent agent;
     private GuardPatrol patrolScript;
 
+    private Health playerHealth;
     private bool isDetectingPlayer = false;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         patrolScript = GetComponent<GuardPatrol>();
+        if (player != null)
+        {
+            playerHealth = player.GetComponent<Health>();
+        }
     }
 
     private void Update()
-{
-    if (player == null) return;
-
-    Vector3 directionToPlayer = player.position - transform.position;
-    float distanceToPlayer = directionToPlayer.magnitude;
-
-    bool playerInRange = distanceToPlayer <= detectionRange;
-
-    float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer.normalized);
-    bool playerInAngle = angleToPlayer <= detectionAngle;
-
-    PlayerStealth playerStealth = player.GetComponent<PlayerStealth>();
-    bool playerVisible = playerStealth != null && !playerStealth.isHidden;
-
-    if (playerInRange && playerInAngle && playerVisible)
     {
-        DetectPlayer();
+        if (player == null) return;
+
+        Vector3 directionToPlayer = player.position - transform.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
+
+        bool playerInRange = distanceToPlayer <= detectionRange;
+
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer.normalized);
+        bool playerInAngle = angleToPlayer <= detectionAngle;
+
+        PlayerStealth playerStealth = player.GetComponent<PlayerStealth>();
+        bool playerVisible = playerStealth != null && !playerStealth.isHidden;
+
+        if (playerInRange && playerInAngle && playerVisible)
+        {
+            DetectPlayer();
+        }
+        else
+        {
+            LosePlayer();
+        }
     }
-    else
-    {
-        LosePlayer();
-    }
-}
 
     private void DetectPlayer()
-{
-    if (isDetectingPlayer) return;
-
-    isDetectingPlayer = true;
-
-    if (agent != null)
     {
-        agent.isStopped = true;
+        if (isDetectingPlayer) return;
+
+        isDetectingPlayer = true;
+        if (playerHealth != null)
+        {
+            playerHealth.SetDetected(true);
+        }
+        if (agent != null)
+        {
+            agent.isStopped = true;
+        }
+
+        Vector3 lookDirection = player.position - transform.position;
+        lookDirection.y = 0f;
+
+        if (lookDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(lookDirection);
+        }
+
+        Debug.Log(gameObject.name + " detected the player!");
     }
 
-    Vector3 lookDirection = player.position - transform.position;
-    lookDirection.y = 0f;
-
-    if (lookDirection != Vector3.zero)
+    private void LosePlayer()
     {
-        transform.rotation = Quaternion.LookRotation(lookDirection);
+        if (!isDetectingPlayer) return;
+
+        isDetectingPlayer = false;
+        if (playerHealth != null)
+        {
+            playerHealth.SetDetected(false);
+        }
+
+            if (agent != null)
+        {
+            agent.isStopped = false;
+        }
+
+        Debug.Log(gameObject.name + " lost the player.");
     }
-
-    Debug.Log(gameObject.name + " detected the player!");
-}
-
-private void LosePlayer()
-{
-    if (!isDetectingPlayer) return;
-
-    isDetectingPlayer = false;
-
-    if (agent != null)
-    {
-        agent.isStopped = false;
-    }
-
-    Debug.Log(gameObject.name + " lost the player.");
-}
-
 }
