@@ -749,6 +749,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b211e11f0b0124b049eab2dc96baeb0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartMenu
+  musicSource: {fileID: 883537845}
+  startSFX: {fileID: 8300000, guid: a0ca8964c08d54c5dbebf245bdc474ca, type: 3}
 --- !u!4 &883537844
 Transform:
   m_ObjectHideFlags: 0
