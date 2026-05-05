@@ -65,6 +65,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 876683211043303226, guid: 0176ce690364db447a3dcd6b797e88db, type: 3}
       insertIndex: -1
       addedObject: {fileID: -7626732394156888921}
+    - targetCorrespondingSourceObject: {fileID: 876683211043303226, guid: 0176ce690364db447a3dcd6b797e88db, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1447272647387019458}
   m_SourcePrefab: {fileID: 100100000, guid: 0176ce690364db447a3dcd6b797e88db, type: 3}
 --- !u!1 &6624757994714833258 stripped
 GameObject:
@@ -132,3 +135,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RockProjectile
   destroyDelay: 3
+--- !u!114 &-1447272647387019458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6624757994714833258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cab11a00ac9184647a9460a74f1d591c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RockCollision
+  breakEffect: {fileID: 0}
+  destroyDelay: 2
