@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
@@ -13,10 +14,14 @@ public class Health : MonoBehaviour
 
     public HealthBar healthBar;
 
+    [Header("Restart Settings")]
+    public string sceneToRestart = "SampleScene";
+
     private float damageTimer;
     private float healTimer;
 
     private bool isDetected;
+    private bool hasRestarted = false;
 
     void Start()
     {
@@ -31,6 +36,9 @@ public class Health : MonoBehaviour
 
     void Update()
     {
+        if (hasRestarted)
+            return;
+
         if (isDetected)
         {
             healTimer = 0f;
@@ -71,6 +79,11 @@ public class Health : MonoBehaviour
         }
 
         Debug.Log("Player health: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            RestartTutorial();
+        }
     }
 
     void Heal(int amount)
@@ -84,5 +97,27 @@ public class Health : MonoBehaviour
         }
 
         Debug.Log("Player health: " + currentHealth);
+    }
+
+    public void RestartTutorial()
+    {
+        if (hasRestarted)
+            return;
+
+        hasRestarted = true;
+
+        Debug.Log("Player failed. Showing fail screen.");
+
+        FailScreenUI failUI = FindFirstObjectByType<FailScreenUI>();
+
+        if (failUI != null)
+        {
+            failUI.ShowFailScreen();
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(sceneToRestart);
+        }
     }
 }

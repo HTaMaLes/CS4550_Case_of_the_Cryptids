@@ -28,10 +28,15 @@ public class FieldOfView : MonoBehaviour
     public float rotationSpeed = 5f;
 
     private bool wasSeeingPlayer;
+    private PlayerStealth playerStealth;
 
     private void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
+        if (playerRef != null)
+        {
+            playerStealth = playerRef.GetComponent<PlayerStealth>();
+        }
 
         if (alertIcon != null)
         {
@@ -75,6 +80,11 @@ public class FieldOfView : MonoBehaviour
 
     private void FieldOfViewCheck()
     {
+        if (playerStealth != null && playerStealth.isHidden)
+        {
+            canSeePlayer = false;
+            return;
+        }
         Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);
 
         if (rangeChecks.Length != 0)

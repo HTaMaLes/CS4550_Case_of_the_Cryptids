@@ -4,27 +4,21 @@ public class BushHide : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            PlayerStealth playerStealth = other.GetComponent<PlayerStealth>();
+        PlayerStealth playerStealth = other.GetComponentInParent<PlayerStealth>();
 
-            if (playerStealth != null)
-            {
-                playerStealth.SetHidden(true);
-            }
+        if (playerStealth != null)
+        {
+            playerStealth.EnterHidingBush();
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            PlayerStealth playerStealth = other.GetComponent<PlayerStealth>();
+        PlayerStealth playerStealth = other.GetComponentInParent<PlayerStealth>();
 
-            if (playerStealth != null)
-            {
-                playerStealth.SetHidden(false);
-            }
+        if (playerStealth != null)
+        {
+            playerStealth.ExitHidingBush();
         }
     }
 }

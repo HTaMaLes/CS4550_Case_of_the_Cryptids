@@ -3,21 +3,25 @@ using UnityEngine.AI;
 
 public class GuardDetection : MonoBehaviour
 {
-    [Header("Detection Settings")]
-    public float detectionRange = 5f;
-    public float detectionAngle = 45f;
+    [Header("Player")]
     public Transform player;
+
+    [Header("Chase Settings")]
+    public float chaseStoppingDistance = 1.5f;
 
     private NavMeshAgent agent;
     private GuardPatrol patrolScript;
-
+    private FieldOfView fieldOfView;
     private Health playerHealth;
-    private bool isDetectingPlayer = false;
+
+    private bool isChasingPlayer = false;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         patrolScript = GetComponent<GuardPatrol>();
+        fieldOfView = GetComponent<FieldOfView>();
+
         if (player != null)
         {
             playerHealth = player.GetComponent<Health>();
@@ -26,69 +30,61 @@ public class GuardDetection : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
+        if (player == null || agent == null || fieldOfView == null)
+            return;
 
-        Vector3 directionToPlayer = player.position - transform.position;
-        float distanceToPlayer = directionToPlayer.magnitude;
-
-        bool playerInRange = distanceToPlayer <= detectionRange;
-
-        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer.normalized);
-        bool playerInAngle = angleToPlayer <= detectionAngle;
-
-        PlayerStealth playerStealth = player.GetComponent<PlayerStealth>();
-        bool playerVisible = playerStealth != null && !playerStealth.isHidden;
-
-        if (playerInRange && playerInAngle && playerVisible)
+        if (fieldOfView.canSeePlayer)
         {
-            DetectPlayer();
+            ChasePlayer();
         }
         else
         {
-            LosePlayer();
+            StopChasingPlayer();
         }
     }
 
-    private void DetectPlayer()
+    private void ChasePlayer()
     {
-        if (isDetectingPlayer) return;
+        isChasingPlayer = true;
 
-        isDetectingPlayer = true;
         if (playerHealth != null)
         {
             playerHealth.SetDetected(true);
         }
-        if (agent != null)
+
+        if (patrolScript != null)
         {
-            agent.isStopped = true;
+            patrolScript.enabled = false;
         }
 
-        Vector3 lookDirection = player.position - transform.position;
-        lookDirection.y = 0f;
+        agent.isStopped = false;
+        agent.stoppingDistance = chaseStoppingDistance;
+        agent.SetDestination(player.position);
 
-        if (lookDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(lookDirection);
-        }
-
-        Debug.Log(gameObject.name + " detected the player!");
+        Debug.Log(gameObject.name + " is chasing the player!");
     }
 
-    private void LosePlayer()
+    private void StopChasingPlayer()
     {
-        if (!isDetectingPlayer) return;
+        if (!isChasingPlayer)
+            return;
 
-        isDetectingPlayer = false;
+        isChasingPlayer = false;
+
         if (playerHealth != null)
         {
             playerHealth.SetDetected(false);
         }
 
-            if (agent != null)
+        agent.isStopped = false;
+        agent.stoppingDistance = 0f;
+
+        if (patrolScript != null)
         {
-            agent.isStopped = false;
+            patrolScript.enabled = true;
+            patrolScript.ResumePatrol();
         }
 
-        Debug.Log(gameObject.name + " lost the player.");
+        Debug.Log(gameObject.name + " stopped chasing the player.");
     }
 }
