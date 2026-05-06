@@ -18,7 +18,7 @@ public class FieldOfView : MonoBehaviour
     public bool canSeePlayer;
 
     [Header("Detection UI")]
-    public GameObject exclamationMark;
+    public GameObject alertIcon;
 
     [Header("Detection Sound")]
     public AudioSource audioSource;
@@ -33,9 +33,9 @@ public class FieldOfView : MonoBehaviour
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
 
-        if (exclamationMark != null)
+        if (alertIcon != null)
         {
-            exclamationMark.SetActive(false);
+            alertIcon.SetActive(false);
         }
 
         StartCoroutine(FOVRoutine());
@@ -61,9 +61,9 @@ public class FieldOfView : MonoBehaviour
 
             FieldOfViewCheck();
 
-            if (exclamationMark != null)
+            if (alertIcon != null)
             {
-                exclamationMark.SetActive(canSeePlayer);
+                alertIcon.SetActive(canSeePlayer);
             }
 
             if (canSeePlayer && !wasSeeingPlayer)
