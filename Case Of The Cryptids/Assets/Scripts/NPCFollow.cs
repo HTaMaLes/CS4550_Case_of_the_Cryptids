@@ -18,6 +18,7 @@ public class NPCFollow : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator animator;
+    private PlayerInventory playerInventory; // NEW
     private bool hasMetPlayer = false;
     private bool isThrowing = false;
 
@@ -25,6 +26,9 @@ public class NPCFollow : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+
+        if (player != null)
+            playerInventory = player.GetComponent<PlayerInventory>(); // NEW
 
         if (agent != null)
             agent.stoppingDistance = followDistance;
@@ -34,6 +38,17 @@ public class NPCFollow : MonoBehaviour
     {
         if (agent == null || player == null || !agent.isOnNavMesh)
             return;
+
+        // NEW: if player does not have the gem, NPC should not follow
+        if (playerInventory == null || !playerInventory.hasGolemGem)
+        {
+            hasMetPlayer = false;
+
+            if (animator != null)
+                animator.SetFloat("Speed", 0f);
+
+            return;
+        }
 
         if (!hasMetPlayer)
         {
@@ -73,7 +88,7 @@ public class NPCFollow : MonoBehaviour
     private IEnumerator ThrowRoutine()
     {
         isThrowing = true;
-         // Stop navigation movement
+
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
 
@@ -85,9 +100,8 @@ public class NPCFollow : MonoBehaviour
         ThrowRock();
 
         yield return new WaitForSeconds(1f);
-        // Resume movement
-        agent.isStopped = false;
 
+        agent.isStopped = false;
         isThrowing = false;
     }
 
@@ -102,15 +116,30 @@ public class NPCFollow : MonoBehaviour
         GameObject rock = Instantiate(rockPrefab, throwPoint.position, throwPoint.rotation);
 
         Rigidbody rb = rock.GetComponent<Rigidbody>();
+
         if (rb != null)
         {
-            rb.AddForce(throwPoint.forward * throwForce, ForceMode.Impulse);
+            Camera mainCamera = Camera.main;
+
+            Vector3 throwDirection;
+
+            if (mainCamera != null)
+            {
+                throwDirection = mainCamera.transform.forward;
+            }
+            else
+            {
+                throwDirection = throwPoint.forward;
+            }
+
+            rb.AddForce(throwDirection * throwForce, ForceMode.Impulse);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        // MODIFIED: player must have the gem before the NPC starts following
+        if (other.CompareTag("Player") && playerInventory != null && playerInventory.hasGolemGem)
         {
             hasMetPlayer = true;
         }
